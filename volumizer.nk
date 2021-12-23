@@ -1,0 +1,223 @@
+Group {
+ name volumizer
+ help http://richardfrazer.com/tools-tutorials/frameblendmerge/
+ knobChanged "if nuke.thisKnob().name() == \"layers\":\n\n\tt = nuke.thisNode()\n\n\ttname = t.name()\n\n\t#print (\"tname: \" + tname)\n\n\n\tnuke.thisNode().begin()\n\n\tframestart = int(t\[\"start_frame\"].value())\n\n\tlayers = int(t\[\"layers\"].value())\n\n\toffsetframes = int(t\[\"offset_frames\"].value())\n\n\tframeend = framestart + (layers * offsetframes)\n\n\tp = -1000\n\n\tfor d in nuke.allNodes():\n\t    if (d.Class() == \"FrameHold\") or (d.Class() == \"Scene\") or (d.Class() == \"Card2\"):\n\t         nuke.delete(d) \n\n\n\tfor x in xrange(0, layers):\n\t    nname = \"FrameHoldVol\" +str(x)\n\t    n = nuke.nodes.FrameHold()        \t\t\n\t    n\[\"name\"].setValue( nname )\n\t    uk = nuke.Int_Knob(\"index\", \"index\")\n\t    n.addKnob(uk)\n\t    n\[\"index\"].setValue( x )\n\t    n\[\"first_frame\"].setExpression( \"parent.start_frame+(parent.offset_frames * index)\" )\n\t    n.setXYpos( p, 600 )\n\t    n.setInput(0, nuke.toNode( \"inputDot\" ))  \n\n\t    cname = \"CardVol\" +str(x)\n\t    if(nuke.exists( nname )):\n\t        #print (nname + \" exists\")\n\t        k = nuke.toNode ( cname ) \n\t        nuke.delete ( k )\n\t    c = nuke.nodes.Card2()           \n\t    c\[\"name\"].setValue( cname )\n\t    uk = nuke.Int_Knob(\"index\", \"index\")\n\t    c.addKnob(uk)\n\t    c\[\"index\"].setValue( x )\n\t    c\[\"translate\"].setExpression( \"parent.offset_z*index\", 2 )\n\t    c.setXYpos( p, 700 )\n\t    c.setInput(0, nuke.toNode( nname ))  \n\n\n\t    p = p + 100\n\n\tnewMerge = nuke.nodes.Scene()\n\tnewMerge\[\"name\"].setValue( \"MergeFrames\" )\n\tnewMerge.setXYpos( -900, 800 )  \n\n\ti = 0\n\n\tfor x in xrange(0, layers):\n\t    nname = \"CardVol\" +str(x)\n\t    n = nuke.toNode( nname )\n\t    #print(\"connecting input \" + str(i))\n\t    newMerge.setInput(i, nuke.toNode( nname ))\n\t    i=i+1\n\n\n\to = nuke.toNode( \"OutputVol\" )\n\to.setInput(0, newMerge)\n\n"
+ selected true
+ xpos 780
+ ypos -64
+ addUserKnob {20 User}
+ addUserKnob {3 layers l "number of layers"}
+ layers 6
+ addUserKnob {3 start_frame l "start frame"}
+ start_frame 100
+ addUserKnob {3 offset_frames l "offset frames"}
+ offset_frames 20
+ addUserKnob {26 ""}
+ addUserKnob {7 offset_z l "offset volume"}
+ offset_z 0.085
+ addUserKnob {22 InputRange l "Input Range" -STARTLINE T "n = nuke.thisNode()\nf = n.firstFrame()\nl = n.lastFrame() \n\nn\['framerangestart'].setValue(f)\nn\['framerangeend'].setValue(l)"}
+ addUserKnob {26 ""}
+ addUserKnob {26 textabout l "" +STARTLINE T "<b>Volumizer</b> v1.3 by Richard Frazer<br>\n<a href=\"www.richardfrazer.com/tools-tutorials/volumizer/\n\">www.richardfrazer.com/tools-tutorials/volumizer/</a>\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -900
+  ypos 396
+ }
+ Dot {
+  name inputDot
+  xpos -866
+  ypos 459
+ }
+set N89371880 [stack 0]
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol5
+  xpos -500
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 5
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol5
+  xpos -500
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 5
+ }
+push $N89371880
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol4
+  xpos -600
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 4
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol4
+  xpos -600
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 4
+ }
+push $N89371880
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol3
+  xpos -700
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 3
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol3
+  xpos -700
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 3
+ }
+push $N89371880
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol2
+  xpos -800
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 2
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol2
+  xpos -800
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 2
+ }
+push $N89371880
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol1
+  xpos -900
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 1
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol1
+  xpos -900
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+  index 1
+ }
+push $N89371880
+ FrameHold {
+  first_frame {{"parent.start_frame+(parent.offset_frames * index)"}}
+  name FrameHoldVol0
+  xpos -1000
+  ypos 600
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+ }
+ Card2 {
+  translate {0 0 {parent.offset_z*index}}
+  control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0 0 0} 
+1 {0 -0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {0.5 0 0} 
+1 {0.5 -0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666865 0} 1 {0 0 0} 1 {1 0 0} 
+1 {-0.5 0 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0 0.5 0} 
+1 {0 0 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {0.5 0.5 0} 
+1 {0.5 0 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0.1666666716 0} 1 {0 -0.1666666716 0} 1 {1 0.5 0} 
+1 {-0.5 0.5 0} 1 {0.1666666865 0 0} 1 {0 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0 1 0} 
+1 {0 0.5 0} 1 {0.1666666716 0 0} 1 {-0.1666666716 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {0.5 1 0} 
+1 {0.5 0.5 0} 1 {0 0 0} 1 {-0.1666666865 0 0} 1 {0 0 0} 1 {0 -0.1666666865 0} 1 {1 1 0} }
+  name CardVol0
+  xpos -1000
+  ypos 700
+  addUserKnob {20 User}
+  addUserKnob {3 index}
+ }
+ Scene {
+  inputs 6
+  name MergeFrames
+  selected true
+  xpos -900
+  ypos 800
+ }
+ Output {
+  name OutputVol
+  xpos -910
+  ypos 927
+ }
+end_group
